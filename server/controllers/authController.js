@@ -2,10 +2,9 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
+const redis = require("../config/redis");
 
-const otpStore = {};
-
-exports.createOtp = async (req, res) => {
+exports.sentOtp = async (req, res) => {
   try {
     const { phone } = req.body;
     if (!phone) {
@@ -14,7 +13,8 @@ exports.createOtp = async (req, res) => {
       });
     }
     const code = Math.floor(10000 + Math.random() * 90000).toString();
-    otpStore[phone] = { code, expiresAt: Date.now() + 5 * 60 * 1000 };
+
+    await redis.set(`otp:${phone}`, code, "EX", 300);
 
     console.log(`OTP for ${phone}:${code}`);
 
@@ -31,21 +31,21 @@ exports.createOtp = async (req, res) => {
 exports.verifyOtp = async (req, res) => {
   try {
     const { phone, code } = req.body;
-    const record = otpStore[phone];
+    const record = await redis.get(`otp:${phone}`);
 
-    if (!record || record.code !== code || record.expiresAt < Date.now()) {
+    if (!record || record !== code) {
       return res.status(400).json({
         message: "Invalid OTP",
       });
     }
 
-    delete otpStore[phone];
+    await redis.del(`otp:${phone}`);
 
     let user = await User.findOne({ phone });
     if (!user) {
       user = await User.create({ phone, otpVerified: true });
     } else {
-      otpVerified: true;
+      user.otpVerified = true;
       await User.save();
     }
 
