@@ -5,8 +5,8 @@ const authRoutes = require("./routes/authRoutes");
 
 const port = 8000;
 
-connectDB();
 app.use(express.json());
+connectDB();
 app.use("/api", authRoutes);
 
 app.get("/", (req, res) => {
