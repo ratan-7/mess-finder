@@ -3,6 +3,7 @@ const app = express();
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const messRoutes=require("./routes/messRoutes")
+const adminAuthRoutes=require("./routes/adminAuthRoutes")
 
 const port = 8000;
 
@@ -11,6 +12,7 @@ connectDB();
 
 app.use("/api", authRoutes);
 app.use("/api",messRoutes);
+app.use("/api",adminAuthRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({

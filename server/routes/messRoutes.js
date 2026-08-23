@@ -9,10 +9,12 @@ const {
   updateMess,
 } = require("../controllers/messController");
 
-router.get("/", getAllMess);
-router.get("/:id", getMessById);
-router.post("/", addMess);
-router.delete("/:id", removeMess);
-router.patch("/:id", updateMess);
+const { requireAdmin, optionalAuth } = require("../middleware/verifyToken");
+
+router.get("/", optionalAuth, getAllMess);
+router.get("/:id", optionalAuth, getMessById);
+router.post("/", requireAdmin, addMess);
+router.delete("/:id", requireAdmin, removeMess);
+router.patch("/:id", requireAdmin, updateMess);
 
 module.exports = router;
