@@ -1,5 +1,6 @@
 const Mess = require("../models/Mess");
 const User = require("../models/User");
+const { hasAccess } = require("../utils/hasAccess");
 
 exports.getAllMess = async (req, res) => {
   try {
@@ -18,6 +19,7 @@ exports.getAllMess = async (req, res) => {
     const user = req.userId ? await User.findById(req.userId) : null;
 
     const result = messes.map((mess) => {
+      const unlocked = hasAccess(user, mess);
       const base = {
         _id: mess._id,
         category: mess.category,
@@ -25,7 +27,15 @@ exports.getAllMess = async (req, res) => {
         budget: mess.budget,
         image: mess.image,
         isFreeSample: mess.isFreeSample,
+        unlocked,
       };
+      if (unlocked) {
+        base.name = mess.name;
+        base.address = mess.address;
+        base.contact = mess.contact;
+        base.description = mess.description;
+        base.fullImages = mess.fullImages;
+      }
 
       return base;
     });
@@ -43,7 +53,7 @@ exports.getMessById = async (req, res) => {
     if (!mess) return res.status(404).json({ message: "Mess not found" });
 
     const user = req.userId ? await User.findById(req.userId) : null;
-
+    const unlocked = hasAccess(user, mess);
     const base = {
       _id: mess._id,
       category: mess.category,
@@ -52,7 +62,13 @@ exports.getMessById = async (req, res) => {
       image: mess.image,
       isFreeSample: mess.isFreeSample,
     };
-
+    if (unlocked) {
+      base.name = mess.name;
+      base.address = mess.address;
+      base.contact = mess.contact;
+      base.description = mess.description;
+      base.fullImages = mess.fullImages;
+    }
     res.json(base);
   } catch (error) {
     res.status(500).json({
