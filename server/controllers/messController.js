@@ -77,3 +77,34 @@ exports.addMess = async (req, res) => {
     });
   }
 };
+
+exports.removeMess = async (req, res) => {
+  try {
+    const mess = await Mess.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      message: "Mess remove successfully!",
+      mess,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+exports.updateMess = async (req, res) => {
+  try {
+    const mess = await Mess.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+
+    res.status(200).json({
+      message: "Mess updated successfully!",
+      mess: req.body,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
