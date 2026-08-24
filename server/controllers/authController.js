@@ -46,7 +46,7 @@ exports.verifyOtp = async (req, res) => {
       user = await User.create({ phone, otpVerified: true });
     } else {
       user.otpVerified = true;
-      await User.save();
+      await user.save();
     }
 
     const token = await jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
