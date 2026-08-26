@@ -11,10 +11,10 @@ const {
 
 const { requireAdmin, optionalAuth } = require("../middleware/verifyToken");
 
-router.get("/", optionalAuth, getAllMess);
-router.get("/:id", optionalAuth, getMessById);
-router.post("/", requireAdmin, addMess);
-router.delete("/:id", requireAdmin, removeMess);
-router.patch("/:id", requireAdmin, updateMess);
+router.get("/mess", optionalAuth, getAllMess);
+router.get("/mess/:id", optionalAuth, getMessById);
+router.post("/mess", requireAdmin, addMess);
+router.delete("/mess/:id", requireAdmin, removeMess);
+router.patch("/mess/:id", requireAdmin, updateMess);
 
 module.exports = router;
