@@ -2,6 +2,7 @@ const MessCard = ({
   name,
   category,
   address,
+  contact,
   budget,
   unlocked,
   onUnlockClick,
@@ -29,13 +30,21 @@ const MessCard = ({
         <p className="text-xl font-bold text-chili">₹{budget}</p>
       </div>
 
-      {!unlocked && (
-        <button
-          onClick={onUnlockClick}
-          className="w-full bg-chili text-cream font-semibold py-2 rounded"
-        >
-          Unlock full details
-        </button>
+      {unlocked && (
+        <div className="flex gap-2 mt-2">
+          href={`tel:${contact}`}
+          onClick={(e) => e.stopPropagation()}
+          className="flex-1 text-center bg-ink text-cream text-sm font-semibold
+          py-2 rounded"
+          <a>Call now</a>
+          href=
+          {`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+          target="_blank" rel="noopener noreferrer" onClick=
+          {(e) => e.stopPropagation()}
+          className="flex-1 text-center border border-ink text-ink text-sm
+          font-semibold py-2 rounded"
+          <a>Directions</a>
+        </div>
       )}
     </div>
   );
