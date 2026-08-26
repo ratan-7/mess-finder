@@ -1,38 +1,71 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./components/Navbar";
-import MessCard from "./components/MessCard";
-import LoginModal from "./components/LoginModal";
 import LocationBar from "./components/LocationBar";
-import PlanModal from "./components/PlanModal";
+import StatusBar from "./components/StatusBar";
+import MessCard from "./components/MessCard";
 import DetailSheet from "./components/DetailSheet";
-import StatsBar from "./components/StatusBar";
+import PlanModal from "./components/PlanModal";
+import LoginModal from "./components/LoginModal";
 import Footer from "./components/Footer";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+const API_BASE = import.meta.env.VITE_API_BASE;
+const CATEGORIES = ["all", "boys-pg", "girls-pg"];
 
-function App() {
-  const [messList, setMessList] = useState([]);
-  const [showLogin, setShowLogin] = useState(false);
+export default function PublicApp() {
+  const [messes, setMesses] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [activeCategory, setActiveCategory] = useState("all");
   const [token, setToken] = useState(null);
-  const [pendingMess, setPendingMess] = useState(null);
-  const [planMess, setPlanMess] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [selectedMess, setSelectedMess] = useState(null);
+  const [planMess, setPlanMess] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [pendingUnlock, setPendingUnlock] = useState(null);
 
   const fetchMesses = async () => {
-    const config = token
-      ? { headers: { Authorization: `Bearer ${token}` } }
-      : {};
-    const res = await axios.get(`${API_BASE}`, config);
-    setMessList(res.data);
+    setLoading(true);
+    try {
+      const config = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : {};
+      const params =
+        activeCategory !== "all" ? { category: activeCategory } : {};
+      const res = await axios.get(`${API_BASE}`, { ...config, params });
+      setMesses(res.data);
+    } catch (err) {
+      console.error("Failed to fetch mess list:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTotalCount = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}`);
+      setTotalCount(res.data.length);
+    } catch (err) {
+      console.error("Failed to fetch total count:", err.message);
+    }
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMesses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [activeCategory, token]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTotalCount();
+  }, []);
+
+  const handleCardClick = (mess) => setSelectedMess(mess);
+  const closeDetailSheet = () => setSelectedMess(null);
 
   const handleUnlockClick = (mess) => {
+    setSelectedMess(null);
     setPlanMess(mess);
   };
 
@@ -40,7 +73,7 @@ function App() {
     const mess = planMess;
     setPlanMess(null);
     if (!token) {
-      setPendingMess({ mess, planType });
+      setPendingUnlock({ mess, planType });
       setShowLogin(true);
     } else {
       startPayment(mess, planType);
@@ -50,9 +83,9 @@ function App() {
   const handleLoggedIn = (tok) => {
     setToken(tok);
     setShowLogin(false);
-    if (pendingMess) {
-      startPayment(pendingMess.mess, pendingMess.planType);
-      setPendingMess(null);
+    if (pendingUnlock) {
+      startPayment(pendingUnlock.mess, pendingUnlock.planType);
+      setPendingUnlock(null);
     }
   };
 
@@ -77,13 +110,15 @@ function App() {
         amount: order.amount,
         currency: order.currency,
         order_id: order.id,
-        name: "Mess Finder",
-        description: `Unlock ${mess.category}`,
+        name: "messkhoj",
+        description:
+          planType === "category"
+            ? `Unlock ${mess.category}`
+            : "Full access — 7 days",
         handler: async (response) => {
           await axios.post(`${API_BASE}/payment/verify`, response, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          alert("Unlocked!");
           fetchMesses();
         },
       };
@@ -95,31 +130,73 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    setToken(null);
+    setSelectedMess(null);
+    setPlanMess(null);
+    setShowLogin(false);
+    setPendingUnlock(null);
+  };
+
   return (
-    <>
-      <Navbar />
+    <div className="min-h-screen bg-kraft-dots flex flex-col">
+      <Navbar
+        isLoggedIn={!!token}
+        onLoginClick={() => setShowLogin(true)}
+        onLogoutClick={handleLogout}
+      />
       <LocationBar />
-      <StatsBar count={messList.length} />
-      <div className="max-w-5xl mx-auto p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {messList.map((mess) => (
-          <div key={mess._id} onClick={() => setSelectedMess(mess)}>
-            <MessCard
-              name={mess.name}
-              category={mess.category}
-              address={mess.address}
-              contact={mess.contact}
-              budget={mess.budget}
-              unlocked={mess.unlocked}
-              onUnlockClick={() => handleUnlockClick(mess)}
-            />
+
+      <div className="flex-1 w-full">
+        <div className="max-w-4xl mx-auto px-4 pt-5">
+          <StatusBar count={totalCount} />
+
+          <div className="flex gap-1.5 mb-5 justify-center flex-wrap">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c}
+                onClick={() => setActiveCategory(c)}
+                className={`text-xs font-semibold px-3.5 py-1.5 rounded-md capitalize ${
+                  activeCategory === c
+                    ? "bg-ink text-cream"
+                    : "bg-transparent text-ink/70 border-[1.5px] border-dashed border-dash-dark"
+                }`}
+              >
+                {c === "all" ? "All" : c.replace("-", " ")}
+              </button>
+            ))}
           </div>
-        ))}
+
+          {loading ? (
+            <div className="text-center text-sm text-muted py-10">
+              Loading mess listings…
+            </div>
+          ) : messes.length === 0 ? (
+            <div className="text-center text-sm text-muted py-10">
+              No mess found in this category yet.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
+              {messes.map((mess) => (
+                <MessCard
+                  key={mess._id}
+                  mess={mess}
+                  onCardClick={handleCardClick}
+                  onUnlockClick={handleUnlockClick}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {showLogin && (
-        <LoginModal
-          onClose={() => setShowLogin(false)}
-          onLoggedIn={handleLoggedIn}
+      <Footer />
+
+      {selectedMess && (
+        <DetailSheet
+          mess={selectedMess}
+          onClose={closeDetailSheet}
+          onUnlockClick={handleUnlockClick}
         />
       )}
 
@@ -130,10 +207,16 @@ function App() {
           onSelectPlan={handleSelectPlan}
         />
       )}
-      <DetailSheet mess={selectedMess} onClose={() => setSelectedMess(null)} />
-      <Footer />
-    </>
+
+      {showLogin && (
+        <LoginModal
+          onClose={() => {
+            setShowLogin(false);
+            setPendingUnlock(null);
+          }}
+          onLoggedIn={handleLoggedIn}
+        />
+      )}
+    </div>
   );
 }
-
-export default App;

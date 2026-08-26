@@ -2,4 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
 
+/* Kraft-paper dot texture used behind the whole app */
+.bg-kraft-dots {
+  background-color: theme("colors.kraft");
+  background-image: radial-gradient(
+    theme("colors.kraft-dot") 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
