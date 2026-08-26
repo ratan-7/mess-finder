@@ -4,7 +4,7 @@ import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function LoginModal({ onClose, onLoggedIn }) {
-  const [step, setStep] = useState("phone"); // "phone" | "otp"
+  const [step, setStep] = useState("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");

@@ -38,7 +38,7 @@ export default function AdminDashboard() {
   const fetchMesses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}`);
+      const res = await axios.get(`${API_BASE}/mess`);
       setMesses(res.data);
     } catch (err) {
       if (!handleAuthError(err)) console.error(err.message);
@@ -69,9 +69,9 @@ export default function AdminDashboard() {
     }
     try {
       if (editingId) {
-        await axios.patch(`${API_BASE}/${editingId}`, form, authHeader);
+        await axios.patch(`${API_BASE}/mess/${editingId}`, form, authHeader);
       } else {
-        await axios.post(`${API_BASE}`, form, authHeader);
+        await axios.post(`${API_BASE}/mess`, form, authHeader);
       }
       setForm(emptyForm);
       setEditingId(null);
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this mess?")) return;
     try {
-      await axios.delete(`${API_BASE}/${id}`, authHeader);
+      await axios.delete(`${API_BASE}/mess/${id}`, authHeader);
       fetchMesses();
     } catch (err) {
       if (!handleAuthError(err))
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Stats */}
+    
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
           <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-chili">
@@ -153,7 +153,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Form */}
         <div className="bg-cream border-[1.5px] border-ink rounded-lg p-5 mb-6">
           <h3 className="font-display font-semibold text-lg text-ink mb-3">
             {editingId ? "Edit Mess" : "Add New Mess"}

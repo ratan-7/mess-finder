@@ -32,7 +32,7 @@ export default function PublicApp() {
         : {};
       const params =
         activeCategory !== "all" ? { category: activeCategory } : {};
-      const res = await axios.get(`${API_BASE}`, { ...config, params });
+      const res = await axios.get(`${API_BASE}/mess`, { ...config, params });
       setMesses(res.data);
     } catch (err) {
       console.error("Failed to fetch mess list:", err.message);
@@ -43,7 +43,7 @@ export default function PublicApp() {
 
   const fetchTotalCount = async () => {
     try {
-      const res = await axios.get(`${API_BASE}`);
+      const res = await axios.get(`${API_BASE}/mess`);
       setTotalCount(res.data.length);
     } catch (err) {
       console.error("Failed to fetch total count:", err.message);
