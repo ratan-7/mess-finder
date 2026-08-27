@@ -24,14 +24,26 @@ const subscriptionSchema = new Schema(
 
 const userSchema = new Schema(
   {
-    phone: {
+    name: {
+      type: String,
+      required: true,
+    },
+
+    email: {
       type: String,
       required: true,
       unique: true,
     },
-    otpVerified: {
-      type: Boolean,
-      default: false,
+
+    googleId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    profilePicture: {
+      type: String,
+      default: null,
     },
     subscription: [subscriptionSchema],
   },

@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { sentOtp, verifyOtp } = require("../controllers/authController");
+const { googleLogin } = require("../controllers/authController");
 
-router.post("/sent-otp", sentOtp);
-router.post("/verify-otp", verifyOtp);
+router.post("/google", googleLogin);
 
 module.exports = router;

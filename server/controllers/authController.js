@@ -2,62 +2,69 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
-const redis = require("../config/redis");
 
-exports.sentOtp = async (req, res) => {
+const { OAuth2Client } = require("google-auth-library");
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+exports.googleLogin = async (req, res) => {
   try {
-    const { phone } = req.body;
-    if (!phone) {
+    const { credential } = req.body;
+
+    if (!credential) {
       return res.status(400).json({
-        message: "Phone required",
+        message: "Google credential is required",
       });
     }
-    const code = Math.floor(10000 + Math.random() * 90000).toString();
-
-    await redis.set(`otp:${phone}`, code, "EX", 300);
-
-    console.log(`OTP for ${phone}:${code}`);
-
-    res.status(200).json({
-      message: "OTP sent",
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
 
-exports.verifyOtp = async (req, res) => {
-  try {
-    const { phone, code } = req.body;
-    const record = await redis.get(`otp:${phone}`);
+    const payload = ticket.getPayload();
 
-    if (!record || record !== code) {
+    const { sub: googleId, email, name, picture, email_verified } = payload;
+
+    if (!email_verified) {
       return res.status(400).json({
-        message: "Invalid OTP",
+        message: "Google email is not verified",
       });
     }
 
-    await redis.del(`otp:${phone}`);
+    let user = await User.findOne({ googleId });
 
-    let user = await User.findOne({ phone });
     if (!user) {
-      user = await User.create({ phone, otpVerified: true });
-    } else {
-      user.otpVerified = true;
-      await user.save();
+      user = await User.create({
+        googleId,
+        email,
+        name,
+        profilePicture: picture,
+      });
     }
 
-    const token = await jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-    res.status(200).json({
-      token: token,
-      user: user,
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        role: "user",
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
+
+    return res.status(200).json({
+      message: "Google Login Successfully",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profilePicture,
+      },
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
