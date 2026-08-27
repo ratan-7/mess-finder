@@ -16,7 +16,6 @@ export default function PublicApp() {
   const [messes, setMesses] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [activeCategory, setActiveCategory] = useState("all");
-  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedMess, setSelectedMess] = useState(null);
@@ -24,6 +23,10 @@ export default function PublicApp() {
   const [showLogin, setShowLogin] = useState(false);
   const [pendingUnlock, setPendingUnlock] = useState(null);
 
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem("token");
+  });
+  
   const fetchMesses = async () => {
     setLoading(true);
     try {

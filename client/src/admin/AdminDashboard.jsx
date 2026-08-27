@@ -117,7 +117,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-kraft-dots">
       <div className="bg-cream border-b-[1.5px] border-ink px-4 py-3.5 flex items-center justify-between">
         <div className="font-display font-bold text-xl text-ink">
-          tiffin<span className="text-chili">wala</span>{" "}
+          mess<span className="text-chili">khoj</span>{" "}
           <span className="text-muted text-sm font-sans font-normal">
             admin
           </span>
@@ -131,7 +131,6 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-    
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
           <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-chili">
