@@ -39,7 +39,7 @@ export default function Footer() {
 
       <div className="border-t border-cream/10 py-4 text-center text-[11px] text-cream/40">
         © {new Date().getFullYear()} messkhoj . Made with ♥️ by{" "}
-        <a href="https://ratanmahta.in">ratanmahata</a>
+        <a href="https://ratanmahata.in">ratanmahata</a>
       </div>
     </footer>
   );
