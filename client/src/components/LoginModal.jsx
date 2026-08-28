@@ -41,18 +41,18 @@ export default function LoginModal({ onClose, onLoggedIn }) {
           Login to unlock
         </h3>
 
-        <p className="text-xs text-muted mb-5">
-          Continue with your Google account.
+        <p className="text-xs text-muted mb-6">
+          Continue with your Google account to see full mess details.
         </p>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center bg-white rounded-lg p-1 border border-dash">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
             theme="outline"
             size="large"
             text="continue_with"
-            width="280"
+            width="260"
           />
         </div>
 
