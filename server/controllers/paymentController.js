@@ -26,7 +26,7 @@ exports.createOrder = async (req, res) => {
     }
 
     const order = await razorpay.orders.create({
-      amount: plan.price * 100, 
+      amount: plan.price * 100,
       currency: "INR",
       receipt: `receipt_${Date.now()}`,
     });
@@ -74,16 +74,22 @@ exports.verifyPayment = async (req, res) => {
       ? new Date(Date.now() + plan.durationDays * 24 * 60 * 60 * 1000)
       : null;
 
-    await User.findByIdAndUpdate(req.userId, {
-      $push: {
-        subscriptions: {
-          type: payment.planType,
-          category: payment.category,
-          purchasedAt: new Date(),
-          expiresAt,
+    await User.findByIdAndUpdate(
+      req.userId,
+      {
+        $push: {
+          subscription: {
+            type: payment.planType,
+            category: payment.category,
+            purchaseAt: new Date(),
+            expiresAt,
+          },
         },
       },
-    });
+      {
+        new: true,
+      },
+    );
 
     res.status(200).json({ message: "Payment verified, access granted" });
   } catch (error) {

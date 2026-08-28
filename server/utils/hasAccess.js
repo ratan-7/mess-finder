@@ -3,7 +3,7 @@ exports.hasAccess = (user, mess) => {
   if (!user) return false;
 
   const now = new Date();
-  return (user.subscriptions || []).some((s) => {
+  return (user.subscription || []).some((s) => {
     if (s.expiresAt && s.expiresAt <= now) return false;
     if (s.type === "full") return true;
     if (s.type === "category") return s.category === mess.category;
