@@ -12,8 +12,7 @@ export default function LoginModal({ onClose, onLoggedIn }) {
 
       localStorage.setItem("token", res.data.token);
 
-      onLoggedIn(res.data.token);
-
+      onLoggedIn(res.data.token, res.data.user);
       onClose();
     } catch (err) {
       console.error(err);

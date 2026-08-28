@@ -26,7 +26,12 @@ export default function PublicApp() {
   const [token, setToken] = useState(() => {
     return localStorage.getItem("token");
   });
-  
+
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const fetchMesses = async () => {
     setLoading(true);
     try {
@@ -82,9 +87,11 @@ export default function PublicApp() {
       startPayment(mess, planType);
     }
   };
-
-  const handleLoggedIn = (tok) => {
+  const handleLoggedIn = (tok, userData) => {
     setToken(tok);
+    setUser(userData);
+    localStorage.setItem("token", tok);
+    localStorage.setItem("user", JSON.stringify(userData));
     setShowLogin(false);
     if (pendingUnlock) {
       startPayment(pendingUnlock.mess, pendingUnlock.planType);
@@ -135,6 +142,9 @@ export default function PublicApp() {
 
   const handleLogout = () => {
     setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setSelectedMess(null);
     setPlanMess(null);
     setShowLogin(false);
@@ -145,6 +155,7 @@ export default function PublicApp() {
     <div className="min-h-screen bg-kraft-dots flex flex-col">
       <Navbar
         isLoggedIn={!!token}
+        user={user}
         onLoginClick={() => setShowLogin(true)}
         onLogoutClick={handleLogout}
       />
