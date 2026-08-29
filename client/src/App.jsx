@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import PublicApp from "./PublicApp";
 import AdminLogin from "./admin/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
+import NotFound from "./components/NotFound";
 
 function RequireAdmin({ children }) {
   const token = localStorage.getItem("adminToken");
@@ -28,6 +29,7 @@ export default function App() {
               </RequireAdmin>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </GoogleOAuthProvider>
