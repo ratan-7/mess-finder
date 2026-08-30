@@ -25,7 +25,7 @@ export default function PlanModal({ mess, onClose, onSelectPlan }) {
             <span className="font-display font-semibold text-base text-ink">
               This category only
             </span>
-            <span className="font-mono font-bold text-lg text-chili">₹29</span>
+            <span className="font-mono font-bold text-lg text-chili">₹19</span>
           </div>
           <p className="text-xs text-muted capitalize">
             Unlocks every {mess.category?.replace("-", " ")} mess — 7 days
@@ -43,7 +43,7 @@ export default function PlanModal({ mess, onClose, onSelectPlan }) {
             <span className="font-display font-semibold text-base text-ink">
               Full access — 7 days
             </span>
-            <span className="font-mono font-bold text-lg text-chili">₹49</span>
+            <span className="font-mono font-bold text-lg text-chili">₹29</span>
           </div>
           <p className="text-xs text-muted">
             Every mess, every category, for a full week

@@ -89,7 +89,7 @@ export default function MessCard({ mess, onCardClick, onUnlockClick }) {
           <span className="w-5.5 h-5.5 rounded-full bg-cream text-chili flex items-center justify-center text-xs">
             🔒
           </span>
-          Unlock full details — ₹29
+          Unlock full details — ₹19
         </button>
       )}
     </div>
