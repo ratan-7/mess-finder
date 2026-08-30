@@ -80,9 +80,9 @@ exports.getMessById = async (req, res) => {
 exports.addMess = async (req, res) => {
   try {
     const freeSampleCount = await Mess.countDocuments({ isFreeSample: true });
-    if (req.body.isFreeSample && freeSampleCount >= 2) {
+    if (req.body.isFreeSample && freeSampleCount >= 20) {
       return res.status(400).json({
-        message: "Only 2 free-sample mess allowed",
+        message: "Only 20 free-sample mess allowed",
       });
     }
     const mess = await Mess.create(req.body);
