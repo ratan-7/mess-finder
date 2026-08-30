@@ -217,8 +217,8 @@ export default function AdminDashboard() {
               onChange={handleChange}
             />
             Free sample{" "}
-            {freeSampleCount >= 2 && !form.isFreeSample && (
-              <span className="text-chili text-xs">(limit of 2 reached)</span>
+            {freeSampleCount >= 20 && !form.isFreeSample && (
+              <span className="text-chili text-xs">(limit of 20 reached)</span>
             )}
           </label>
           <div className="flex gap-2">
