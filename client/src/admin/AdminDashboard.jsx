@@ -140,7 +140,7 @@ export default function AdminDashboard() {
           </div>
           <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-turmeric">
-              {freeSampleCount}/2
+              {freeSampleCount}/20
             </div>
             <div className="text-xs text-muted">Free samples used</div>
           </div>
