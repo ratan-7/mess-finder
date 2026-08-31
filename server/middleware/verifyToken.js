@@ -47,3 +47,21 @@ exports.requireAuth = (req, res, next) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
+
+exports.requireOwner = async (req, res, next) => {
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Login required" });
+  }
+  try {
+    const decoded = jwt.verify(header.split(" ")[1], process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user || user.role !== "mess_owner") {
+      return res.status(403).json({ message: "Mess owner access only" });
+    }
+    req.userId = decoded.userId;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};

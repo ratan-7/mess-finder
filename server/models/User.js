@@ -45,6 +45,11 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    role: {
+      type: String,
+      enum: ["student", "mess_owner"],
+      default: "student",
+    },
     subscription: [subscriptionSchema],
   },
   { timestamps: true },

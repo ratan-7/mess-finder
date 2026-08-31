@@ -5,7 +5,7 @@ const { hasAccess } = require("../utils/hasAccess");
 exports.getAllMess = async (req, res) => {
   try {
     const { category, gender, budget } = req.query;
-    const filter = {};
+    const filter = { status: "approved" };
     if (category) filter.category = category;
     if (gender) filter.gender = gender;
     if (budget) filter.budget = { $lte: Number(budget) };
@@ -61,6 +61,7 @@ exports.getMessById = async (req, res) => {
       budget: mess.budget,
       image: mess.image,
       isFreeSample: mess.isFreeSample,
+      unlocked,
     };
     if (unlocked) {
       base.name = mess.name;
@@ -85,12 +86,45 @@ exports.addMess = async (req, res) => {
         message: "Only 20 free-sample mess allowed",
       });
     }
-    const mess = await Mess.create(req.body);
+    const mess = await Mess.create({ ...req.body, status: "approved" });
     res.status(201).json(mess);
   } catch (error) {
     res.status(500).json({
       message: error.message,
     });
+  }
+};
+
+exports.addOwnerMess = async (req, res) => {
+  try {
+    const mess = await Mess.create({
+      ...req.body,
+      status: "pending",
+      owner: req.userId,
+    });
+    res.status(201).json(mess);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getMyMess = async (req, res) => {
+  try {
+    const messes = await Mess.find({ owner: req.userId }).sort({
+      createdAt: -1,
+    });
+    res.status(200).json(messes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllMessAdmin = async (req, res) => {
+  try {
+    const messes = await Mess.find().sort({ createdAt: -1 });
+    res.status(200).json(messes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -116,7 +150,7 @@ exports.updateMess = async (req, res) => {
 
     res.status(200).json({
       message: "Mess updated successfully!",
-      mess: req.body,
+      mess
     });
   } catch (error) {
     res.status(500).json({

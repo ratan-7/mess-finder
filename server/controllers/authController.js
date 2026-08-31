@@ -9,7 +9,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 exports.googleLogin = async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { credential, role } = req.body;
 
     if (!credential) {
       return res.status(400).json({
@@ -39,6 +39,7 @@ exports.googleLogin = async (req, res) => {
         email,
         name,
         profilePicture: picture,
+        role: role == "mess_owner" ? "mess_owner" : "student",
       });
     }
 

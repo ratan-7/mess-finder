@@ -39,6 +39,19 @@ const messSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    status: {
+      type: String,
+      enum: ["approved", "pending", "reject"],
+      default: "pending",
+    },
+
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "Admin",
