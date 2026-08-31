@@ -8,7 +8,7 @@ export default function MessCard({ mess, onCardClick, onUnlockClick }) {
     >
       {mess.isFreeSample && (
         <div className="absolute -top-2.5 left-4 bg-turmeric text-ink text-[10px] font-bold px-2.5 py-1 -rotate-3 border-[1.5px] border-dashed border-ink rounded">
-          FREE SAMPLE
+          FREE LISTING
         </div>
       )}
 
