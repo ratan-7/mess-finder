@@ -144,13 +144,27 @@ exports.removeMess = async (req, res) => {
 
 exports.updateMess = async (req, res) => {
   try {
+    const { status } = req.body;
+
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({
+        message: "Invalid status",
+      });
+    }
+
     const mess = await Mess.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
 
+    if (!mess) {
+      return res.status(404).json({
+        message: "Mess not found",
+      });
+    }
+
     res.status(200).json({
-      message: "Mess updated successfully!",
-      mess
+      message: `Mess ${status} successfully`,
+      mess,
     });
   } catch (error) {
     res.status(500).json({

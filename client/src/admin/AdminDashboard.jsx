@@ -9,11 +9,16 @@ const emptyForm = {
   category: "",
   gender: "any",
   budget: "",
-  image: "",
   address: "",
   contact: "",
   description: "",
   isFreeSample: false,
+};
+
+const STATUS_STYLES = {
+  pending: "bg-turmeric/20 text-ink",
+  approved: "bg-sage-600/20 text-sage-600",
+  rejected: "bg-chili/10 text-chili",
 };
 
 export default function AdminDashboard() {
@@ -38,7 +43,7 @@ export default function AdminDashboard() {
   const fetchMesses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/mess`);
+      const res = await axios.get(`${API_BASE}/mess/admin/all`, authHeader);
       setMesses(res.data);
     } catch (err) {
       if (!handleAuthError(err)) console.error(err.message);
@@ -69,7 +74,11 @@ export default function AdminDashboard() {
     }
     try {
       if (editingId) {
-        await axios.patch(`${API_BASE}/mess/${editingId}`, form, authHeader);
+        await axios.patch(
+          `${API_BASE}/mess/${editingId}/status`,
+          form,
+          authHeader,
+        );
       } else {
         await axios.post(`${API_BASE}/mess`, form, authHeader);
       }
@@ -96,11 +105,39 @@ export default function AdminDashboard() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this mess?")) return;
     try {
-      await axios.delete(`${API_BASE}/mess/${id}`, authHeader);
+      await axios.delete(`${API_BASE}/mess/${id}/status`, authHeader);
       fetchMesses();
     } catch (err) {
       if (!handleAuthError(err))
         alert(err.response?.data?.message || "Delete failed");
+    }
+  };
+
+  const handleApprove = async (id) => {
+    try {
+      await axios.patch(
+        `${API_BASE}/mess/${id}/status`,
+        { status: "approved" },
+        authHeader,
+      );
+      fetchMesses();
+    } catch (err) {
+      if (!handleAuthError(err))
+        alert(err.response?.data?.message || "Approve failed");
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await axios.patch(
+        `${API_BASE}/mess/${id}/status`,
+        { status: "rejected" },
+        authHeader,
+      );
+      fetchMesses();
+    } catch (err) {
+      if (!handleAuthError(err))
+        alert(err.response?.data?.message || "Reject failed");
     }
   };
 
@@ -112,10 +149,11 @@ export default function AdminDashboard() {
   const inputClass =
     "w-full px-3.5 py-2.5 border border-dash-dark rounded-md text-sm";
   const freeSampleCount = messes.filter((m) => m.isFreeSample).length;
+  const pendingCount = messes.filter((m) => m.status === "pending").length;
 
   return (
     <div className="min-h-screen bg-kraft-dots">
-      <div className="bg-cream border-b-[1.5px] border-ink px-4 py-3.5 flex items-center justify-between">
+      <div className="bg-cream border-b-[1.5px] border-ink max-w-4xl mx-auto px-4 py-3.5 flex items-center justify-between">
         <div className="font-display font-bold text-xl text-ink">
           mess<span className="text-chili">khoj</span>{" "}
           <span className="text-muted text-sm font-sans font-normal">
@@ -131,12 +169,18 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-chili">
               {messes.length}
             </div>
-            <div className="text-xs text-muted">Total mess listed</div>
+            <div className="text-xs text-muted">Total mess</div>
+          </div>
+          <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4">
+            <div className="text-2xl font-mono font-bold text-turmeric">
+              {pendingCount}
+            </div>
+            <div className="text-xs text-muted">Pending approval</div>
           </div>
           <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-turmeric">
@@ -144,11 +188,11 @@ export default function AdminDashboard() {
             </div>
             <div className="text-xs text-muted">Free samples used</div>
           </div>
-          <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4 col-span-2 sm:col-span-1">
+          <div className="bg-cream border-[1.5px] border-ink rounded-lg p-4">
             <div className="text-2xl font-mono font-bold text-ink">
               {new Set(messes.map((m) => m.category)).size}
             </div>
-            <div className="text-xs text-muted">Categories in use</div>
+            <div className="text-xs text-muted">Categories</div>
           </div>
         </div>
 
@@ -180,20 +224,6 @@ export default function AdminDashboard() {
               className={inputClass}
             />
             <input
-              name="image"
-              placeholder="Image URL"
-              value={form.image}
-              onChange={handleChange}
-              className={inputClass}
-            />
-            <input
-              name="address"
-              placeholder="Address"
-              value={form.address}
-              onChange={handleChange}
-              className={inputClass}
-            />
-            <input
               name="contact"
               placeholder="Contact number"
               value={form.contact}
@@ -201,6 +231,13 @@ export default function AdminDashboard() {
               className={inputClass}
             />
           </div>
+          <input
+            name="address"
+            placeholder="Address"
+            value={form.address}
+            onChange={handleChange}
+            className={`${inputClass} mb-3`}
+          />
           <textarea
             name="description"
             placeholder="Description"
@@ -239,7 +276,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* List */}
         <h3 className="font-display font-semibold text-lg text-ink mb-2">
           All Mess
         </h3>
@@ -267,8 +303,30 @@ export default function AdminDashboard() {
                       FREE
                     </span>
                   )}
+                  <span
+                    className={`ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-full capitalize ${STATUS_STYLES[mess.status] || ""}`}
+                  >
+                    {mess.status}
+                  </span>
                 </div>
                 <span className="flex gap-2 flex-shrink-0">
+                  {mess.status === "pending" && (
+                    <>
+                      <button
+                        onClick={() => handleApprove(mess._id)}
+                        className="bg-green-600 text-white rounded px-3 py-1 text-xs font-semibold hover:bg-green-700 transition-colors"
+                      >
+                        Approve
+                      </button>
+
+                      <button
+                        onClick={() => handleReject(mess._id)}
+                        className="border border-chili text-chili rounded px-3 py-1 text-xs font-semibold hover:bg-chili hover:text-white transition-colors"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => handleEdit(mess)}
                     className="border border-dash-dark rounded px-3 py-1 text-xs"

@@ -39,14 +39,14 @@ exports.googleLogin = async (req, res) => {
         email,
         name,
         profilePicture: picture,
-        role: role == "mess_owner" ? "mess_owner" : "student",
+        role: role === "mess_owner" ? "mess_owner" : "student",
       });
     }
 
     const token = jwt.sign(
       {
         userId: user._id,
-        role: "user",
+        role: user.role,
       },
       process.env.JWT_SECRET,
       {
@@ -62,6 +62,7 @@ exports.googleLogin = async (req, res) => {
         name: user.name,
         email: user.email,
         profilePicture: user.profilePicture,
+        role: user.role,
       },
     });
   } catch (error) {

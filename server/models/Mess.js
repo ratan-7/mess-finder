@@ -42,7 +42,7 @@ const messSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["approved", "pending", "reject"],
+      enum: ["approved", "pending", "rejected"],
       default: "pending",
     },
 

@@ -8,6 +8,7 @@ import DetailSheet from "./components/DetailSheet";
 import PlanModal from "./components/PlanModal";
 import LoginModal from "./components/LoginModal";
 import Footer from "./components/Footer";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const CATEGORIES = ["all", "boys-pg", "girls-pg"];
@@ -87,12 +88,19 @@ export default function PublicApp() {
       startPayment(mess, planType);
     }
   };
+  const navigate = useNavigate();
   const handleLoggedIn = (tok, userData) => {
     setToken(tok);
     setUser(userData);
     localStorage.setItem("token", tok);
     localStorage.setItem("user", JSON.stringify(userData));
     setShowLogin(false);
+
+    if (userData?.role === "mess_owner") {
+      navigate("/owner/dashboard");
+      return;
+    }
+
     if (pendingUnlock) {
       startPayment(pendingUnlock.mess, pendingUnlock.planType);
       setPendingUnlock(null);

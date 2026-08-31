@@ -5,10 +5,16 @@ import PublicApp from "./PublicApp";
 import AdminLogin from "./admin/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
 import NotFound from "./components/NotFound";
+import OwnerDashboard from "./owner/ownerDashboard";
 
 function RequireAdmin({ children }) {
   const token = localStorage.getItem("adminToken");
   return token ? children : <Navigate to="/admin" replace />;
+}
+
+function RequireOwner({ children }) {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  return user?.role === "mess_owner" ? children : <Navigate to="/" replace />;
 }
 
 export default function App() {
@@ -30,6 +36,14 @@ export default function App() {
             }
           />
           <Route path="*" element={<NotFound />} />
+          <Route
+            path="/owner/dashboard"
+            element={
+              <RequireOwner>
+                <OwnerDashboard />
+              </RequireOwner>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </GoogleOAuthProvider>

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 exports.requireAdmin = async (req, res, next) => {
   const header = req.headers.authorization;
